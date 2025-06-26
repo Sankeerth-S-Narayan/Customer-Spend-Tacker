@@ -1,0 +1,80 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: Generates a structured implementation plan for a full-stack analytics dashboard project with Docker, Panel, FastAPI, PostgreSQL, and GitHub Actions
+globs:
+  - "**/*.py"
+  - "**/*.yml"
+  - "**/*.sql"
+  - "**/Dockerfile"
+alwaysApply: false
+---
+
+# Rule: Designing and Implementing a Full-Stack Analytics Platform
+
+## Goal
+
+To guide the user through building a complete full-stack analytics dashboard application for exploring customer spending data. The application includes frontend, backend, database, Docker containerization, and CI/CD via GitHub Actions. The system should support login, data visualization, filtering, and interaction through REST APIs.
+
+## Project Workflow
+
+The project follows a structured, phase-based approach.
+
+1.  **Master Plan:** The `tasks/project-tasks.md` file serves as the high-level roadmap, tracking the completion of major project phases.
+
+2.  **Phase-Based Execution Loop:** For each phase listed in the master plan, the following steps will be taken:
+    a. **Initiate Phase:** Announce the beginning of the new phase.
+    b. **Clarify Requirements:** Pause and ask the user detailed, clarifying questions specific to the technical goals of that phase.
+    c. **Generate Detailed Task List:** Based on the user's answers, create a new, phase-specific task file in markdown (e.g., `tasks/phases/phase-2-docker.md`). This file will contain a granular, technical checklist for the phase.
+    d. **Execute Tasks:** Work through the checklist in the phase-specific file, following the Git branching strategy (e.g., `feature/docker-setup`).
+    e. **Complete Phase:** Once all tasks in the phase-specific file are done, mark the entire phase as complete in the main `tasks/project-tasks.md` and write the summary.
+
+## Clarifying Questions (Examples)
+
+- **User Actions:** "What should the user be able to do with the dashboard?"
+- **Frontend Tooling:** "Are you using Panel, Streamlit, or React/Vue?"
+- **Data Source:** "Do you want to simulate the data or use a public API?"
+- **Auth:** "Is a simple username/password login enough for now?"
+- **Visualization:** "What metrics should be shown? Totals, averages, categories?"
+- **Dev Tools:** "Do you want all services Dockerized or only backend/database?"
+- **CI Goals:** "Should GitHub Actions run lint, tests, and check formatting?"
+
+## System Design Document Structure
+
+1. **Overview/Introduction**
+2. **User Story & Flow**
+3. **Architecture Summary (Diagram + Services)**
+4. **Frontend Description**
+5. **Backend Description**
+6. **API Endpoints**
+7. **Database Schema**
+8. **Docker & Compose Setup**
+9. **Git Branching Strategy**
+10. **CI/CD Plan with GitHub Actions**
+11. **Local Development Flow**
+12. **Open Questions**
+
+## Target Audience
+
+A new developer trying to gain real-world experience with full-stack apps, Docker, CI/CD, and analytics-based workflows.
+
+## Final Instructions
+
+1. Do NOT generate code until explicitly asked.
+2. Focus on design, architecture, and modular breakdown first.
+3. Use clear headings, tables, and step-by-step task lists where applicable.
+4. Always generate code when user prompts a Yes, Y, or YES
+5. Until a phase is completely done dont move on to next phase 
+6. Make a sure you tick the task/subtasks before moving to next 
+7. Once a task is ticked, in  the same task list I want you to write a small summary for about 3-4 lines on what was done in task and what does the task does or what the feature does
+8. When generating code, make sure the code is very robust and it follows the best practices in the world for that implementation
+9. dont run any commands, instead show the commands that I have to run and I will run the commands
+10. At the beginning of each session, review these rules and all files in the `tasks/` directory to thoroughly understand the project's current state and completed tasks.
+11. When starting, confirm once what phase is going with the user too and then begin your process 
+
+
+
+
