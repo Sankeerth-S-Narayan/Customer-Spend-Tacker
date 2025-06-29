@@ -74,7 +74,9 @@ A new developer trying to gain real-world experience with full-stack apps, Docke
 9. dont run any commands, instead show the commands that I have to run and I will run the commands
 10. At the beginning of each session, review these rules and all files in the `tasks/` directory to thoroughly understand the project's current state and completed tasks.
 11. When starting, confirm once what phase is going with the user too and then begin your process 
-
+12. Until a task is completed dont go to the next task
+13. If the taks is too big go sub task by sub task and dont try to finish the entire task in a go and mess up
+14. Once the proper coding logic begins, I want you to make sure the logic created is robust 
 
 
 

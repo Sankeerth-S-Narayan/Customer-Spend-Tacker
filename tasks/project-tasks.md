@@ -10,7 +10,7 @@
 ### 🔰 Phase 1: Project Initialization
 
 **Setup Repo & Structure**
-- [ ] Create GitHub repo (`analytics-dashboard`)
+- [x] Create GitHub repo (`analytics-dashboard`)
 - [x] Create core folders: `/frontend`, `/backend`, `/db`
 - [x] Add `.gitignore` for Python, VSCode, and Docker
 - [x] Create `.env` file with secrets and DB config
@@ -28,23 +28,27 @@
 ### 🐳 Phase 2: Docker Environment Setup
 
 **Docker & Compose**
-- [ ] Write `Dockerfile` for backend (FastAPI)
-- [ ] Write `Dockerfile` for frontend (Panel)
-- [ ] Set up PostgreSQL service in Docker
-- [ ] Create `docker-compose.yml` to orchestrate services
-- [ ] Add volume for persistent DB data
-- [ ] Add healthcheck for backend & db
-- [ ] Test `docker-compose up` locally
+- [x] Write `Dockerfile` for backend (FastAPI)
+- [x] Write `Dockerfile` for frontend (Panel)
+- [x] Set up PostgreSQL service in Docker
+- [x] Create `docker-compose.yml` to orchestrate services
+- [x] Add volume for persistent DB data
+- [x] Add healthcheck for backend & db
+- [x] Test `docker-compose up` locally
+
+> **Phase 2 Summary:** The entire application environment has been successfully containerized using Docker and Docker Compose. Individual `Dockerfile`s were created for the FastAPI backend and Panel frontend, following best practices for security and efficiency. The `docker-compose.yml` file was configured to orchestrate the startup of all three services, including a PostgreSQL database, with healthchecks to ensure proper dependency startup and a named volume for persistent data storage. After resolving initial build and runtime issues, the full stack is now running locally.
 
 ---
 
 ### 🧾 Phase 3: Database Design & Seeding
 
 **Schema Creation**
-- [ ] Design SQL schema: `users`, `transactions`
-- [ ] Write `init.sql` to prefill users and mock transaction data
-- [ ] Load `init.sql` via Docker volume
-- [ ] Test DB connection from backend
+- [x] Design SQL schema: `users`, `transactions`
+- [x] Write `init.sql` to prefill users and mock transaction data
+- [x] Load `init.sql` via Docker volume
+- [x] Test DB connection from backend
+
+> **Phase 3 Summary:** The database schema was designed and implemented with a focus on providing rich data for analytics. The `init.sql` script was created to define both `users` and `transactions` tables and was populated with a diverse set of mock data for three distinct user profiles. The database service was successfully rebuilt and tested, confirming that the schema and data are loaded correctly on container startup. The database is now fully prepared for the backend to interact with it.
 
 ---
 
