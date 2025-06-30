@@ -47,7 +47,7 @@ services:
     container_name: panel_frontend
     restart: on-failure
     ports:
-      - "5006:5006"
+      - "8001:8001"
     volumes:
       - ./frontend:/app
     depends_on:

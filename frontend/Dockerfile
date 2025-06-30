@@ -4,6 +4,9 @@ FROM python:3.11-slim-bookworm
 # Set the working directory in the container
 WORKDIR /app
 
+# Add the app directory to the PYTHONPATH
+ENV PYTHONPATH "${PYTHONPATH}:/app"
+
 # Copy the dependencies file first to leverage Docker cache
 COPY requirements.txt .
 
@@ -21,5 +24,5 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser
 # Switch to the non-root user to run the application
 USER appuser
 
-# Command to run the application
-CMD ["panel", "serve", "main.py", "--address", "0.0.0.0", "--port", "5006", "--allow-websocket-origin", "*"] 
+# Set the command to run the application
+CMD ["panel", "serve", "app/main.py", "--address", "0.0.0.0", "--port", "8001", "--autoreload"] 
