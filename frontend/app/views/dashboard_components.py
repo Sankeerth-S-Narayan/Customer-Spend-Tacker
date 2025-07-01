@@ -37,8 +37,17 @@ def create_metric_cards(metrics: dict) -> pn.Row:
     except (ValueError, TypeError):
         avg_transaction = 0.0
     
-    # Format the values for display
-    total_spend_str = f"${total_spend:,.2f}"
+    # Function to format large numbers compactly
+    def format_currency(value):
+        if value >= 1000000:
+            return f"${value/1000000:.1f}M"
+        elif value >= 1000:
+            return f"${value/1000:.1f}K"
+        else:
+            return f"${value:,.2f}"
+    
+    # Format the values for display - use compact format for large numbers
+    total_spend_str = format_currency(total_spend) if total_spend >= 10000 else f"${total_spend:,.2f}"
     avg_transaction_str = f"${avg_transaction:,.2f}"
 
     # Define common styles for the number indicators
@@ -47,6 +56,9 @@ def create_metric_cards(metrics: dict) -> pn.Row:
         "border": "1px solid #ddd",
         "border-radius": "5px",
         "box-shadow": "2px 2px 5px #eee",
+        "word-wrap": "break-word",
+        "overflow": "hidden",
+        "white-space": "normal"
     }
 
     # Create the individual metric cards
@@ -66,21 +78,46 @@ def create_metric_cards(metrics: dict) -> pn.Row:
         sizing_mode="stretch_width"
     )
     
-    # Display top categories as a simple markdown pane for now
+    # Display top 3 categories only
     top_categories = metrics.get('spending_by_category', {})
-    top_categories_list = [f"- {cat}: ${val:,.2f}" for cat, val in top_categories.items()]
-    top_categories_md = pn.pane.Markdown(
-        "**Top Categories**\n" + "\n".join(top_categories_list),
+    # Sort by value and take only top 3
+    sorted_categories = sorted(top_categories.items(), key=lambda x: x[1], reverse=True)[:3]
+    top_categories_list = [f"{cat}: ${val:,.2f}" for cat, val in sorted_categories]
+    
+    # Create Top Categories card using the same Number indicator approach
+    # Format as HTML string with smaller font size
+    if sorted_categories:
+        # Create a simple formatted string showing just the first category as main value
+        top_category_amount = sorted_categories[0][1]
+        # Create HTML formatted display with smaller font
+        categories_html = f'<div style="font-size: 23.5px; line-height: 1.3; margin-top: 10px;">'
+        categories_html += f"{sorted_categories[0][0]}: ${sorted_categories[0][1]:,.2f}"
+        if len(sorted_categories) > 1:
+            categories_html += f"<br>{sorted_categories[1][0]}: ${sorted_categories[1][1]:,.2f}"
+        if len(sorted_categories) > 2:
+            categories_html += f"<br>{sorted_categories[2][0]}: ${sorted_categories[2][1]:,.2f}"
+        categories_html += '</div>'
+        categories_display = categories_html
+    else:
+        top_category_amount = 0
+        categories_display = '<div style="font-size: 20px; margin-top: 10px;">No data</div>'
+    
+    # Use a Number indicator but with custom format to show our categories
+    top_categories_md = pn.indicators.Number(
+        name="Top Categories",
+        value=top_category_amount,
+        format=categories_display,
         styles=card_style,
         sizing_mode="stretch_width"
     )
 
-    # Arrange cards in a responsive row
+    # Arrange cards in a responsive row with proper spacing
     return pn.Row(
         total_spend_card,
         avg_transaction_card,
         top_categories_md,
-        sizing_mode="stretch_width"
+        sizing_mode="stretch_width",
+        margin=(10, 5)  # Add margin to prevent overflow
     )
 
 def create_charts_view(df: pd.DataFrame) -> pn.Column:
@@ -102,15 +139,24 @@ def create_charts_view(df: pd.DataFrame) -> pn.Column:
 
     # 1. Bar Chart: Spending by Category
     spend_by_category = df.groupby('category')['amount'].sum().sort_values(ascending=False)
-    bar_chart = spend_by_category.hvplot.bar(
+    # Create a proper DataFrame for better tooltip formatting
+    category_df = spend_by_category.reset_index()
+    category_df.columns = ['category', 'total_amount']
+    
+    bar_chart = category_df.hvplot.bar(
+        x='category',
+        y='total_amount',
         title="Total Spend by Category",
         xlabel="Category",
         ylabel="Total Amount ($)",
         height=250,  # Much more compact height
-        
         grid=True,
         responsive=True,
-    ).opts(tools=['hover'], margin=(5, 5, 5, 5))  # Reduced margins
+    ).opts(
+        tools=['hover'], 
+        margin=(5, 5, 5, 5),
+        hooks=[lambda plot, element: setattr(plot.handles['hover'], 'tooltips', [('Category', '@category'), ('Amount', '$@total_amount{0,0.00}')])]
+    )
 
     # 2. Line Chart: Spending Over Time
     spend_over_time = df.set_index('transaction_date').resample('D')['amount'].sum()
@@ -131,16 +177,26 @@ def create_charts_view(df: pd.DataFrame) -> pn.Column:
     if data['amount'].sum() == 0:
         pie_chart = pn.pane.Alert("No spending data to display in pie chart.", alert_type='info')
     else:
+        # Create a blue-themed color palette with different shades
         num_categories = len(data)
-        if num_categories > len(Category20c):
-            # Repeat the palette if there are more than 20 categories
-            palette = Category20c[len(Category20c)] * (num_categories // len(Category20c) + 1)
-            data['color'] = palette[:num_categories]
-        elif num_categories >= 3:
-            data['color'] = Category20c[num_categories]
+        blue_palette = [
+            '#1f77b4',  # Standard blue
+            '#aec7e8',  # Light blue
+            '#0066cc',  # Medium blue
+            '#4d94d9',  # Sky blue
+            '#0052a3',  # Dark blue
+            '#6bb8ff',  # Bright light blue
+            '#003d7a',  # Navy blue
+            '#8cc8ff',  # Very light blue
+        ]
+        
+        # Extend palette if we have more categories
+        if num_categories > len(blue_palette):
+            # Repeat the palette if needed
+            extended_palette = blue_palette * (num_categories // len(blue_palette) + 1)
+            data['color'] = extended_palette[:num_categories]
         else:
-            # Use a simple palette for 1 or 2 categories
-            data['color'] = ['#2ca02c', '#d62728'][:num_categories]
+            data['color'] = blue_palette[:num_categories]
 
         data['angle'] = data['amount']/data['amount'].sum() * 2*pi
         data['percentage'] = (data['amount']/data['amount'].sum() * 100).round(1)
@@ -158,9 +214,10 @@ def create_charts_view(df: pd.DataFrame) -> pn.Column:
             margin=(10, 20, 5, 30)   # Reduce right margin since we extended x_range
         )
 
-        pie_chart.wedge(
+        pie_chart.annular_wedge(
             x=-0.34, y=0,  # Move pie chart further left to create more space for legend
-            radius=0.35,  # Slightly smaller radius to ensure it fits within bounds
+            outer_radius=0.35,  # Outer radius
+            #inner_radius=0.15,  # Inner radius to create donut hole
             start_angle=cumsum('angle', include_zero=True), 
             end_angle=cumsum('angle'),
             line_color="white", 
@@ -169,26 +226,7 @@ def create_charts_view(df: pd.DataFrame) -> pn.Column:
             source=data
         )
         
-        # Calculate positions for percentage labels
-        import numpy as np
-        data['start_angle_val'] = np.cumsum([0] + data['angle'].tolist()[:-1])
-        data['mid_angle'] = data['start_angle_val'] + data['angle']/2
-        data['label_x'] = -0.35 + 0.18 * np.cos(data['mid_angle'])  # Adjust for moved pie chart
-        data['label_y'] = 0.18 * np.sin(data['mid_angle'])
-        data['label_text'] = [f"{p}%" for p in data['percentage']]  # Add as column
-        
-        # Add percentage labels inside wedges
-        pie_chart.text(
-            x='label_x', 
-            y='label_y', 
-            text='label_text',  # Reference the column name
-            source=data,
-            text_align="center", 
-            text_baseline="middle",
-            text_color="black",
-            text_font_size="8pt",
-            text_font_style="bold"
-        )
+
 
         pie_chart.axis.axis_label=None
         pie_chart.axis.visible=False
