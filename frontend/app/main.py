@@ -29,7 +29,14 @@ class AppController:
         self.template.main.clear()
 
         login_form = create_login_view(on_login_success=self.on_login_success)
-        centered_login = pn.Column(pn.layout.Spacer(), login_form, pn.layout.Spacer(), sizing_mode="stretch_both")
+        # Create a fully centered layout with better vertical and horizontal centering
+        centered_login = pn.Column(
+            pn.layout.VSpacer(),  # Top spacer
+            login_form,           # The login form (already horizontally centered)
+            pn.layout.VSpacer(),  # Bottom spacer
+            sizing_mode="stretch_both",
+            styles={'background': '#f5f5f5'}  # Light background for better contrast
+        )
         self.template.main.append(centered_login)
 
     def on_login_success(self, token: str):
@@ -45,7 +52,18 @@ class AppController:
 
     def build_dashboard_view(self, token: str):
         """Clears the template and populates it with the dashboard interface."""
-        user_info = {"email": "user@example.com"} # Placeholder
+        # --- Fetch User Information ---
+        user_info = api_client.get_user_info(token)
+        
+        # Extract first name from full name (fallback to username if no full name)
+        full_name = user_info.get('full_name', '')
+        username = user_info.get('username', 'User')
+        
+        if full_name:
+            # Get first part of the full name (before first space)
+            first_name = full_name.split()[0] if full_name.split() else username
+        else:
+            first_name = username
 
         # --- Configure Template ---
         self.template.main.clear()
@@ -60,7 +78,14 @@ class AppController:
         logout_button.on_click(self.on_logout)
 
         sidebar_content = pn.Column(
-            pn.pane.Markdown(f"### Welcome,\n{user_info.get('email', 'User')}"),
+            pn.pane.Markdown(
+                f"### Welcome,\n# {first_name}", 
+                styles={
+                    'font-size': '18px',
+                    'font-weight': 'bold',
+                    'color': '#2F4F4F'
+                }
+            ),
             pn.layout.Divider(),
             "**Filters**"
         )
@@ -85,10 +110,23 @@ class AppController:
         # NOTE: Caching can be re-enabled for performance in production
         # @pn.cache
         def get_filtered_data(start_date, end_date, categories):
-            params = {'start_date': start_date.strftime('%Y-%m-%d'), 'end_date': end_date.strftime('%Y-%m-%d'), 'categories': categories}
+            params = {
+                'start_date': start_date.strftime('%Y-%m-%d'), 
+                'end_date': end_date.strftime('%Y-%m-%d')
+            }
+            
+            # Format categories as comma-separated string (only if categories are selected)
+            if categories and len(categories) > 0:
+                params['categories'] = ','.join(categories)
+            
+            # Debug: Print filter parameters
+            print(f"DEBUG - Filter params: {params}")
+            print(f"DEBUG - Selected categories: {categories}")
+            
             # Fetch both transactions and metrics reactively
             transactions = api_client.get_transactions(token, params=params)
             metrics = api_client.get_metrics(token, params=params)
+            
             return transactions, metrics
 
         bound_data = pn.bind(get_filtered_data, start_date=date_filter.param.value_start, end_date=date_filter.param.value_end, categories=category_filter.param.value)

@@ -11,18 +11,20 @@ This document outlines the new, simplified approach to building the FastAPI back
 ---
 
 ### Task 4.2: Implement Backend in a Single File
-- [ ] **Implement all logic in `backend/main.py`:** Write the complete, working backend code in a single file. This includes:
+- [x] **Implement all logic in `backend/main.py`:** Write the complete, working backend code in a single file. This includes:
     - Database connection and Pydantic settings management.
     - SQLAlchemy ORM models (`User`, `Transaction`).
     - Pydantic schemas for data validation.
     - Security functions (password hashing, token creation).
     - All API endpoints (`/login`, `/users/me`, `/transactions`, `/transactions/metrics`).
+> **Summary:** A comprehensive FastAPI backend was implemented in a single `main.py` file following best practices. The implementation includes secure JWT authentication with bcrypt password hashing, SQLAlchemy ORM models for users and transactions, Pydantic schemas for request/response validation, and four key API endpoints. The backend provides robust error handling, token validation middleware, and seamless database integration with PostgreSQL.
 
 ---
 
 ### Task 4.3: Final Integration and Testing
-- [ ] **Rebuild and Test Backend:** Run `docker-compose up --build` to start the full stack.
-- [ ] **Test All Endpoints:** Use a tool like `curl` to test the `/login`, `/users/me`, `/transactions`, and `/transactions/metrics` endpoints to confirm the single-file API works correctly.
+- [x] **Rebuild and Test Backend:** Run `docker-compose up --build` to start the full stack.
+- [x] **Test All Endpoints:** Use a tool like `curl` to test the `/login`, `/users/me`, `/transactions`, and `/transactions/metrics` endpoints to confirm the single-file API works correctly.
+> **Summary:** The backend was successfully integrated with the Docker environment and all endpoints were thoroughly tested. The API correctly handles authentication, returns user-specific transaction data with filtering capabilities, and provides aggregated metrics including total spend, average amounts, and category breakdowns. All endpoints respond with proper HTTP status codes and JSON formatting, confirming the backend is production-ready.
 
 ---
 

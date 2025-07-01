@@ -126,17 +126,40 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 def get_user_by_username(db: Session, username: str):
     return db.query(User).filter(User.username == username).first()
 
-def get_transactions_by_owner(db: Session, owner_id: int, skip: int = 0, limit: int = 100):
-    return db.query(Transaction).filter(Transaction.user_id == owner_id).offset(skip).limit(limit).all()
-
-def get_metrics_by_owner(db: Session, owner_id: int):
-    total_spent = db.query(func.sum(Transaction.amount)).filter(Transaction.user_id == owner_id).scalar() or 0.0
-    average_transaction = db.query(func.avg(Transaction.amount)).filter(Transaction.user_id == owner_id).scalar() or 0.0
+def get_transactions_by_owner(db: Session, owner_id: int, skip: int = 0, limit: int = 100, 
+                             start_date: str = None, end_date: str = None, categories: List[str] = None):
+    query = db.query(Transaction).filter(Transaction.user_id == owner_id)
     
-    spending_by_category = db.query(
+    # Apply date filters if provided
+    if start_date:
+        query = query.filter(Transaction.transaction_date >= start_date)
+    if end_date:
+        query = query.filter(Transaction.transaction_date <= end_date)
+    
+    # Apply category filters if provided
+    if categories and len(categories) > 0:
+        query = query.filter(Transaction.category.in_(categories))
+    
+    return query.offset(skip).limit(limit).all()
+
+def get_metrics_by_owner(db: Session, owner_id: int, start_date: str = None, end_date: str = None, categories: List[str] = None):
+    query = db.query(Transaction).filter(Transaction.user_id == owner_id)
+    
+    # Apply same filters as transactions
+    if start_date:
+        query = query.filter(Transaction.transaction_date >= start_date)
+    if end_date:
+        query = query.filter(Transaction.transaction_date <= end_date)
+    if categories and len(categories) > 0:
+        query = query.filter(Transaction.category.in_(categories))
+    
+    total_spent = query.with_entities(func.sum(Transaction.amount)).scalar() or 0.0
+    average_transaction = query.with_entities(func.avg(Transaction.amount)).scalar() or 0.0
+    
+    spending_by_category = query.group_by(Transaction.category).with_entities(
         Transaction.category,
         func.sum(Transaction.amount).label("total")
-    ).filter(Transaction.user_id == owner_id).group_by(Transaction.category).all()
+    ).all()
 
     return {
         "total_spent": total_spent,
@@ -206,15 +229,52 @@ def read_transactions(
     current_user: User = Depends(get_current_user), 
     db: Session = Depends(get_db), 
     skip: int = 0, 
-    limit: int = 100
+    limit: int = 100,
+    start_date: str = None,
+    end_date: str = None,
+    categories: str = None  # Comma-separated string of categories
 ):
-    transactions = get_transactions_by_owner(db=db, owner_id=current_user.id, skip=skip, limit=limit)
+    # Parse categories from comma-separated string
+    category_list = None
+    if categories:
+        category_list = [cat.strip() for cat in categories.split(',') if cat.strip()]
+    
+    transactions = get_transactions_by_owner(
+        db=db, 
+        owner_id=current_user.id, 
+        skip=skip, 
+        limit=limit,
+        start_date=start_date,
+        end_date=end_date,
+        categories=category_list
+    )
     return transactions
 
 @app.get("/api/v1/transactions/metrics", response_model=dict)
-def read_user_metrics(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return get_metrics_by_owner(db=db, owner_id=current_user.id)
+def read_user_metrics(
+    current_user: User = Depends(get_current_user), 
+    db: Session = Depends(get_db),
+    start_date: str = None,
+    end_date: str = None,
+    categories: str = None  # Comma-separated string of categories
+):
+    # Parse categories from comma-separated string
+    category_list = None
+    if categories:
+        category_list = [cat.strip() for cat in categories.split(',') if cat.strip()]
+    
+    return get_metrics_by_owner(
+        db=db, 
+        owner_id=current_user.id,
+        start_date=start_date,
+        end_date=end_date,
+        categories=category_list
+    )
 
 @app.get("/")
 def read_root():
     return {"message": "API is running"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}

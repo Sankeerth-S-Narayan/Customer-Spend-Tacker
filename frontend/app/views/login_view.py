@@ -17,11 +17,35 @@ def create_login_view(on_login_success):
     Returns:
         A Panel Column containing the login UI.
     """
-    # 1. Create Widgets
-    title = pn.pane.Markdown("## 📈 Customer Spending Analytics", sizing_mode="stretch_width", styles={'text-align': 'center'})
-    username_input = pnw.TextInput(name="Username", placeholder="Enter your username...")
-    password_input = pnw.PasswordInput(name="Password", placeholder="Enter your password...")
-    login_button = pnw.Button(name="Login", button_type="primary")
+    # 1. Create Widgets with improved styling
+    title = pn.pane.Markdown(
+        "# 📈 Customer Spending Analytics", 
+        styles={
+            'text-align': 'center',
+            'color': '#2F4F4F',
+            'font-weight': 'bold',
+            'margin-bottom': '20px'
+        }
+    )
+    username_input = pnw.TextInput(
+        name="Username", 
+        placeholder="Enter your username...", 
+        sizing_mode="stretch_width",
+        height=45
+    )
+    password_input = pnw.PasswordInput(
+        name="Password", 
+        placeholder="Enter your password...", 
+        sizing_mode="stretch_width",
+        height=45
+    )
+    login_button = pnw.Button(
+        name="Login", 
+        button_type="primary", 
+        sizing_mode="stretch_width",
+        height=45,
+        styles={'font-size': '16px', 'font-weight': 'bold'}
+    )
     
     # An alert pane to show login status
     alert_pane = pn.pane.Alert(alert_type="danger", visible=False)
@@ -56,17 +80,32 @@ def create_login_view(on_login_success):
     # 3. Link the callback to the button
     login_button.on_click(login_callback)
 
-    # 4. Arrange components in a layout
-    login_layout = pn.Column(
+    # 4. Create a centered login card with better styling
+    login_card = pn.Column(
         title,
         pn.layout.Divider(),
         username_input,
         password_input,
         login_button,
         alert_pane,
+        width=400,  # Fixed width for consistent appearance
+        margin=(40, 20, 40, 20),  # Add padding around the form
+        styles={
+            'background': 'white',
+            'border-radius': '10px',
+            'box-shadow': '0 4px 6px rgba(0, 0, 0, 0.1)',
+            'padding': '30px'
+        }
+    )
+    
+    # 5. Create the complete centered layout
+    login_layout = pn.Row(
+        pn.layout.HSpacer(),  # Left spacer
+        login_card,           # The login form card
+        pn.layout.HSpacer(),  # Right spacer
         sizing_mode="stretch_width",
-        max_width=400,  # Constrain width for a cleaner look
-        align='center',
+        height=600,  # Give it enough height
+        align='center'
     )
     
     return login_layout 

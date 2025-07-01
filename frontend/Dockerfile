@@ -24,5 +24,5 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser
 # Switch to the non-root user to run the application
 USER appuser
 
-# Set the command to run the application
-CMD ["panel", "serve", "app/main.py", "--address", "0.0.0.0", "--port", "8001", "--autoreload"] 
+# Set the command to run the application with correct websocket origin
+CMD ["panel", "serve", "app/main.py", "--address", "0.0.0.0", "--port", "8001", "--autoreload", "--allow-websocket-origin=localhost:8501"] 

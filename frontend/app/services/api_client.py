@@ -54,8 +54,15 @@ class ApiClient:
         """
         transactions_url = f"{self.base_url}/transactions"
         headers = self._get_auth_headers(token)
+        
+        # Filter out None values from params
+        clean_params = {}
+        if params:
+            clean_params = {k: v for k, v in params.items() if v is not None}
+        
         try:
-            response = self.session.get(transactions_url, headers=headers, params=params)
+            print(f"DEBUG - API call to {transactions_url} with params: {clean_params}")
+            response = self.session.get(transactions_url, headers=headers, params=clean_params)
             response.raise_for_status()
             return pd.DataFrame(response.json())
         except requests.exceptions.RequestException as e:
@@ -73,12 +80,37 @@ class ApiClient:
         """
         metrics_url = f"{self.base_url}/transactions/metrics"
         headers = self._get_auth_headers(token)
+        
+        # Filter out None values from params
+        clean_params = {}
+        if params:
+            clean_params = {k: v for k, v in params.items() if v is not None}
+        
         try:
-            response = self.session.get(metrics_url, headers=headers, params=params)
+            print(f"DEBUG - API call to {metrics_url} with params: {clean_params}")
+            response = self.session.get(metrics_url, headers=headers, params=clean_params)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
             print(f"An error occurred fetching metrics: {e}")
+            return {}
+
+    def get_user_info(self, token: str) -> dict:
+        """
+        Fetches the current user's information from the API.
+        Args:
+            token: The JWT access token.
+        Returns:
+            A dictionary with user information, or an empty dictionary on error.
+        """
+        user_url = f"{self.base_url}/users/me"
+        headers = self._get_auth_headers(token)
+        try:
+            response = self.session.get(user_url, headers=headers)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred fetching user info: {e}")
             return {}
 
 # A global instance of the API client that can be imported elsewhere

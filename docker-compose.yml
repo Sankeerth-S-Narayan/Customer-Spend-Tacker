@@ -47,9 +47,12 @@ services:
     container_name: panel_frontend
     restart: on-failure
     ports:
-      - "8001:8001"
+      - "8501:8001"  # Fixed port mapping to match what we've been using
     volumes:
       - ./frontend:/app
+    environment:
+      - PYTHONPATH=/app
+      - PANEL_AUTORELOAD=true  # Enable Panel auto-reload
     depends_on:
       - backend
 
