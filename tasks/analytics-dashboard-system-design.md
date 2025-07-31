@@ -1,4 +1,4 @@
-# 💼 Customer Spending Analytics Dashboard - System Design
+# 💰 Spend Tracker - System Design
 
 **Version:** 1.0
 **Date:** June 25, 2025

@@ -12,16 +12,18 @@ This document outlines the specific steps and commands needed to complete the pr
   ```
   > **Summary:** The `git init` command was executed, creating a new `.git` directory in the project root. This initializes the project as a local Git repository, enabling version control.
 
-- [ ] **Create Core Branches:** Run these commands to create our main branches.
+- [x] **Create Core Branches:** Run these commands to create our main branches.
   ```bash
+  # First, create all files and make the initial commit.
+  # Then, create the new branches from the committed state.
   git branch main
   git branch dev
-  git branch test
   ```
-- [ ] **Switch to Development Branch:** We will start our work on the `dev` branch.
+- [x] **Switch to Development Branch:** We will start our work on the `dev` branch.
   ```bash
-  git checkout dev
+  git switch dev
   ```
+  > **Summary:** After the initial commit, the `main` and `dev` branches were successfully created. We then switched to the `dev` branch, which will serve as our primary line of development. The `git switch` command was used for its clarity and reliability.
 
 ---
 
@@ -120,8 +122,9 @@ This document outlines the specific steps and commands needed to complete the pr
 
 ### Task 1.4: Make Initial Commit
 
-- [ ] **Stage and Commit:** After creating all the files and folders above, run the following commands to make your first commit, following the conventional commit standard.
+- [x] **Stage and Commit:** After creating all the files and folders above, run the following commands to make your first commit, following the conventional commit standard.
   ```bash
   git add .
   git commit -m "feat: initial project structure and configuration"
-  ``` 
+  ```
+  > **Summary:** The initial project files and directory structure have been staged and committed to the repository with the message "feat: initial project structure and configuration". This establishes the baseline for our project's version history. 
