@@ -41,7 +41,7 @@ This analytics dashboard provides a comprehensive view of personal spending patt
 - **Interactive Charts**: 
   - Bar chart (spending by category)
   - Line chart (spending over time)
-  - Donut chart (category proportions)
+  - Pie chart (category proportions)
 - **Dynamic Filtering**: Date range and category selection
 - **Real-time Updates**: All visualizations update reactively
 
