@@ -19,7 +19,7 @@ def create_login_view(on_login_success):
     """
     # 1. Create Widgets with improved styling
     title = pn.pane.Markdown(
-        "# 📈 Customer Spending Analytics", 
+        "# 💰 Spend Tracker", 
         styles={
             'text-align': 'center',
             'color': '#2F4F4F',

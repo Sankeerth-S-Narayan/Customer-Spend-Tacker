@@ -11,7 +11,7 @@ class AppController:
 
     def __init__(self):
         self.template = pn.template.MaterialTemplate(
-            title="Customer Spending Analytics",
+            title="Spend Tracker",
             header_background="#2F4F4F",
         )
         if 'auth_token' in pn.state.cache:
